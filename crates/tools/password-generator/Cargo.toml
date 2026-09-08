@@ -1,0 +1,8 @@
+[package]
+name = "hnd-password-generator"
+version = "0.1.0"
+edition = { workspace = true }
+
+[dependencies]
+rand = "0.10.2"
+thiserror = { workspace = true }
