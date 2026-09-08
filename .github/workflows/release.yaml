@@ -57,7 +57,6 @@ jobs:
           ARCHIVE="${{ env.BIN_NAME }}-${{ matrix.target }}.tar.gz"
           cp target/${{ matrix.target }}/release/${{ env.BIN_NAME }} .
           tar -czf "$ARCHIVE" ${{ env.BIN_NAME }}
-          mv "$ARCHIVE" "${{ github.workspace }}/"
 
       - name: Package (Windows)
         if: runner.os == 'Windows'
@@ -66,7 +65,6 @@ jobs:
           $ARCHIVE = "${{ env.BIN_NAME }}-${{ matrix.target }}.zip"
           Copy-Item "target/${{ matrix.target }}/release/${{ env.BIN_NAME }}.exe" -Destination "."
           Compress-Archive -Path "${{ env.BIN_NAME }}.exe" -DestinationPath $ARCHIVE
-          Move-Item $ARCHIVE "$env:GITHUB_WORKSPACE"
 
       - name: Upload build artifact
         uses: actions/upload-artifact@v7
