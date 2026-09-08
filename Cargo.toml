@@ -1,6 +1,6 @@
 [workspace]
 resolver = "3"
-members = ["crates/tools/password-generator"]
+members = ["crates/cli", "crates/tools/password-generator"]
 
 [workspace.package]
 edition = "2024"
