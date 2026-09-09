@@ -1,7 +1,7 @@
 [package]
 name = "hnd-password-generator"
 description = "A configurable and secure password generation library with strength estimation"
-version = "0.1.1"
+version = "0.1.2"
 edition = { workspace = true }
 license = { workspace = true }
 repository = { workspace = true }
