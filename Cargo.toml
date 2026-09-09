@@ -4,7 +4,6 @@ members = ["crates/cli", "crates/tools/password-generator"]
 
 [workspace.package]
 edition = "2024"
-version = "0.1.2"
 repository = "https://github.com/SkandarS0/HandyTools"
 license = "MIT"
 
