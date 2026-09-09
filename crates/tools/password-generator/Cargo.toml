@@ -9,3 +9,6 @@ repository = { workspace = true }
 [dependencies]
 rand = "0.10.2"
 thiserror = { workspace = true }
+
+[package.metadata.release]
+tag = false

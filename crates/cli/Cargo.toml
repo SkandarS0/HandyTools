@@ -9,6 +9,9 @@ readme = "README.md"
 keywords = ["cli", "password", "generator", "utilities", "tools"]
 categories = ["command-line-utilities"]
 
+[package.metadata.release]
+tag-name = "v{{version}}"
+
 [dependencies]
 clap = { version = "4.6.6", features = ["derive", "color", "error-context", "help", "usage", "suggestions", "unicode"] }
 thiserror = { workspace = true }
