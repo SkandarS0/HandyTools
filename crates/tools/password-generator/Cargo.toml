@@ -1,7 +1,10 @@
 [package]
 name = "hnd-password-generator"
+description = "A configurable and secure password generation library with strength estimation"
 version = "0.1.0"
 edition = { workspace = true }
+license = { workspace = true }
+repository = { workspace = true }
 
 [dependencies]
 rand = "0.10.2"
