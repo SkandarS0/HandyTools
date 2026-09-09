@@ -16,4 +16,5 @@ anyhow = { version = "1.0.104" }
 # Local
 hnd-password-generator = { path = "../tools/password-generator", version = "0.1.1" }
 
-
+[package.metadata.release]
+pre-release-commit-message = "chore(release): Release {{crate_name}} version {{version}}"

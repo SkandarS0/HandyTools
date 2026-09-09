@@ -11,6 +11,10 @@ license = "MIT"
 [workspace.dependencies]
 thiserror = "2.0.20"
 
+[workspace.metadata.release]
+sign-commit = true
+sign-tag = true
+
 [profile.release]
 strip = true
 lto = true
