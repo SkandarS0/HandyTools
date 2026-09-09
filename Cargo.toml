@@ -15,6 +15,8 @@ sign-commit = true
 sign-tag = true
 consolidate-commits = false
 pre-release-commit-message = "chore(release): Release {{crate_name}} version {{version}}"
+tag-message = "chore(release): Release {{crate_name}} version {{version}}"
+owners = ["SkandarS0"]
 
 [profile.release]
 strip = true
