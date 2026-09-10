@@ -18,7 +18,7 @@ pub struct PasswordGeneratorSettings {
 impl Default for PasswordGeneratorSettings {
     fn default() -> Self {
         Self {
-            length: 14,
+            length: 16,
             include_numbers: true,
             include_symbols: true,
             include_uppercase: true,

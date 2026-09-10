@@ -18,7 +18,7 @@ pub enum PwdCommands {
 #[derive(Debug, Args, Clone)]
 pub struct GenerateArgs {
     /// Length of the password
-    #[arg(short = 'l', long, default_value_t = 14)]
+    #[arg(short = 'l', long, default_value_t = 16)]
     pub length: u8,
 
     /// Exclude lowercase letters (a-z)
@@ -113,7 +113,7 @@ mod tests {
         let TestSubcommand::Pwd(pwd_args) = cli.command;
         let PwdCommands::Generate(gen_args) = pwd_args.command;
 
-        assert_eq!(gen_args.length, 14);
+        assert_eq!(gen_args.length, 16);
         assert_eq!(gen_args.count, 1);
         assert!(!gen_args.no_lowercase);
         assert!(!gen_args.no_uppercase);
@@ -126,7 +126,7 @@ mod tests {
         assert!(!gen_args.show_strength);
 
         let settings = PasswordGeneratorSettings::from(&gen_args);
-        assert_eq!(settings.length, 14);
+        assert_eq!(settings.length, 16);
         assert!(settings.include_lowercase);
         assert!(settings.include_uppercase);
         assert!(settings.include_numbers);
