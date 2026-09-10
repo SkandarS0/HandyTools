@@ -1,17 +1,17 @@
-use super::args::{GenerateArgs, PwdArgs, PwdCommands};
+use super::args::{PasswordGenerationArgs, PasswordSubcommand, PasswordSubcommands};
 use super::errors::PasswordCliError;
 use hnd_password_generator::{PasswordGeneratorSettings, estimate_strength};
 use std::io::{self, Write};
 
-pub fn execute_pwd(args: &PwdArgs) -> Result<(), PasswordCliError> {
+pub fn execute_pwd(args: &PasswordSubcommand) -> Result<(), PasswordCliError> {
     let mut stdout = io::stdout().lock();
     match &args.command {
-        PwdCommands::Generate(gen_args) => execute_generate(gen_args, &mut stdout),
+        PasswordSubcommands::Generate(gen_args) => execute_generate(gen_args, &mut stdout),
     }
 }
 
 pub fn execute_generate<W: Write>(
-    args: &GenerateArgs,
+    args: &PasswordGenerationArgs,
     writer: &mut W,
 ) -> Result<(), PasswordCliError> {
     if args.count == 0 {
@@ -50,7 +50,7 @@ mod tests {
 
     #[test]
     fn generates_single_default_password() {
-        let args = GenerateArgs {
+        let args = PasswordGenerationArgs {
             length: 16,
             no_lowercase: false,
             no_uppercase: false,
@@ -75,7 +75,7 @@ mod tests {
 
     #[test]
     fn generates_multiple_passwords() {
-        let args = GenerateArgs {
+        let args = PasswordGenerationArgs {
             length: 20,
             no_lowercase: false,
             no_uppercase: false,
@@ -102,7 +102,7 @@ mod tests {
 
     #[test]
     fn generates_with_strength_info() {
-        let args = GenerateArgs {
+        let args = PasswordGenerationArgs {
             length: 24,
             no_lowercase: false,
             no_uppercase: false,
@@ -130,7 +130,7 @@ mod tests {
 
     #[test]
     fn outputs_passwords_sorted_by_descending_entropy() {
-        let args = GenerateArgs {
+        let args = PasswordGenerationArgs {
             length: 16,
             no_lowercase: false,
             no_uppercase: false,
@@ -170,7 +170,7 @@ mod tests {
 
     #[test]
     fn fails_on_zero_count() {
-        let args = GenerateArgs {
+        let args = PasswordGenerationArgs {
             length: 16,
             no_lowercase: false,
             no_uppercase: false,
@@ -191,7 +191,7 @@ mod tests {
 
     #[test]
     fn fails_on_invalid_generator_settings() {
-        let args = GenerateArgs {
+        let args = PasswordGenerationArgs {
             length: 16,
             no_lowercase: true,
             no_uppercase: true,

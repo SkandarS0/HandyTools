@@ -3,20 +3,20 @@ use hnd_password_generator::PasswordGeneratorSettings;
 
 #[derive(Debug, Args, Clone)]
 #[command(args_conflicts_with_subcommands = true)]
-pub struct PwdArgs {
+pub struct PasswordSubcommand {
     #[command(subcommand)]
-    pub command: PwdCommands,
+    pub command: PasswordSubcommands,
 }
 
 #[derive(Debug, Subcommand, Clone)]
-pub enum PwdCommands {
+pub enum PasswordSubcommands {
     /// Generate secure random passwords
     #[command(alias = "gen")]
-    Generate(GenerateArgs),
+    Generate(PasswordGenerationArgs),
 }
 
 #[derive(Debug, Args, Clone)]
-pub struct GenerateArgs {
+pub struct PasswordGenerationArgs {
     /// Length of the password
     #[arg(short = 'l', long, default_value_t = 16)]
     pub length: u8,
@@ -62,8 +62,8 @@ pub struct GenerateArgs {
     pub show_strength: bool,
 }
 
-impl From<&GenerateArgs> for PasswordGeneratorSettings {
-    fn from(args: &GenerateArgs) -> Self {
+impl From<&PasswordGenerationArgs> for PasswordGeneratorSettings {
+    fn from(args: &PasswordGenerationArgs) -> Self {
         let mut builder = PasswordGeneratorSettings::builder();
         builder = builder.length(args.length);
 
@@ -104,14 +104,14 @@ mod tests {
     #[derive(Subcommand, Debug)]
     enum TestSubcommand {
         #[command(alias = "password")]
-        Pwd(PwdArgs),
+        Pwd(PasswordSubcommand),
     }
 
     #[test]
     fn parses_default_generate_command() {
         let cli = TestCli::parse_from(["test", "pwd", "generate"]);
         let TestSubcommand::Pwd(pwd_args) = cli.command;
-        let PwdCommands::Generate(gen_args) = pwd_args.command;
+        let PasswordSubcommands::Generate(gen_args) = pwd_args.command;
 
         assert_eq!(gen_args.length, 16);
         assert_eq!(gen_args.count, 1);
@@ -152,7 +152,7 @@ mod tests {
             "--strength",
         ]);
         let TestSubcommand::Pwd(pwd_args) = cli.command;
-        let PwdCommands::Generate(gen_args) = pwd_args.command;
+        let PasswordSubcommands::Generate(gen_args) = pwd_args.command;
 
         assert_eq!(gen_args.length, 32);
         assert_eq!(gen_args.count, 4);
@@ -173,7 +173,7 @@ mod tests {
     fn parses_include_all_and_alphanumeric() {
         let cli = TestCli::parse_from(["test", "pwd", "generate", "--alphanumeric", "--allow-all"]);
         let TestSubcommand::Pwd(pwd_args) = cli.command;
-        let PwdCommands::Generate(gen_args) = pwd_args.command;
+        let PasswordSubcommands::Generate(gen_args) = pwd_args.command;
 
         assert!(gen_args.alphanumeric);
         assert!(gen_args.include_all);
