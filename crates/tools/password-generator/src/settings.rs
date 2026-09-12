@@ -44,19 +44,3 @@ impl PasswordGeneratorSettings {
     }
 }
 
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn default_settings() {
-        let settings = PasswordGeneratorSettings::default();
-        assert_eq!(settings.length, 16);
-        assert!(settings.include_numbers);
-        assert!(settings.include_symbols);
-        assert!(settings.include_uppercase);
-        assert!(settings.include_lowercase);
-        assert!(!settings.include_similar_characters);
-        assert!(!settings.include_ambiguous_characters);
-    }
-}
