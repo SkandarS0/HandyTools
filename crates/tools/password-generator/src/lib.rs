@@ -8,5 +8,5 @@ mod strength;
 
 pub use errors::PasswordGeneratorError;
 pub use generator::{generate, generate_with_rng};
-pub use settings::{PasswordGeneratorSettings, PasswordGeneratorSettingsBuilder};
+pub use settings::PasswordGeneratorSettings;
 pub use strength::{PasswordStrength, PasswordStrengthReport, estimate_strength};

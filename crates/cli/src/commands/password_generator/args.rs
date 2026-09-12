@@ -1,21 +1,21 @@
 use clap::{Args, Subcommand};
 use hnd_password_generator::PasswordGeneratorSettings;
 
-#[derive(Debug, Args, Clone)]
+#[derive(Debug, Args)]
 #[command(args_conflicts_with_subcommands = true)]
 pub struct PasswordSubcommand {
     #[command(subcommand)]
     pub command: PasswordSubcommands,
 }
 
-#[derive(Debug, Subcommand, Clone)]
+#[derive(Debug, Subcommand)]
 pub enum PasswordSubcommands {
     /// Generate secure random passwords
     #[command(alias = "gen")]
     Generate(PasswordGenerationArgs),
 }
 
-#[derive(Debug, Args, Clone)]
+#[derive(Debug, Args)]
 pub struct PasswordGenerationArgs {
     /// Length of the password
     #[arg(short = 'l', long, default_value_t = 16)]
@@ -64,29 +64,15 @@ pub struct PasswordGenerationArgs {
 
 impl From<&PasswordGenerationArgs> for PasswordGeneratorSettings {
     fn from(args: &PasswordGenerationArgs) -> Self {
-        let mut builder = PasswordGeneratorSettings::builder();
-        builder = builder.length(args.length);
-
-        if args.no_lowercase {
-            builder = builder.include_lowercase(false);
+        Self {
+            length: args.length,
+            include_numbers: !args.no_numbers,
+            include_symbols: !args.no_symbols && !args.alphanumeric,
+            include_uppercase: !args.no_uppercase,
+            include_lowercase: !args.no_lowercase,
+            include_similar_characters: args.include_similar || args.include_all,
+            include_ambiguous_characters: args.include_ambiguous || args.include_all,
         }
-        if args.no_uppercase {
-            builder = builder.include_uppercase(false);
-        }
-        if args.no_numbers {
-            builder = builder.include_numbers(false);
-        }
-        if args.no_symbols || args.alphanumeric {
-            builder = builder.include_symbols(false);
-        }
-        if args.include_similar || args.include_all {
-            builder = builder.include_similar_characters(true);
-        }
-        if args.include_ambiguous || args.include_all {
-            builder = builder.include_ambiguous_characters(true);
-        }
-
-        builder.build()
     }
 }
 
