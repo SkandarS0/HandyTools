@@ -11,6 +11,7 @@ license = "MIT"
 thiserror = "2.0.20"
 
 [workspace.metadata.release]
+allow-branch = ["main"]
 sign-commit = true
 sign-tag = true
 consolidate-commits = false
