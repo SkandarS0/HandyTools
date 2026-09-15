@@ -17,4 +17,4 @@ clap = { version = "4.6.6", features = ["derive", "color", "error-context", "hel
 thiserror = { workspace = true }
 anyhow = { version = "1.0.104" }
 # Local
-hnd-password-generator = { path = "../tools/password-generator", version = "0.2.0" }
+hnd-password-generator = { path = "../tools/password-generator", version = "0.3.0" }
