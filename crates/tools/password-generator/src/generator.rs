@@ -4,86 +4,88 @@ use crate::charsets::{AMBIGUOUS, LOWERCASE, NUMBERS, SIMILAR, SYMBOLS, UPPERCASE
 use crate::errors::PasswordGeneratorError;
 use crate::settings::PasswordGeneratorSettings;
 
-/// Generates a random password using the default thread-local random number generator.
-pub fn generate(settings: PasswordGeneratorSettings) -> Result<String, PasswordGeneratorError> {
-    let mut rng = rand::rng();
-    generate_with_rng(settings, &mut rng)
-}
-
-/// Generates a random password using a provided random number generator.
-pub fn generate_with_rng<R: Rng + ?Sized>(
-    settings: PasswordGeneratorSettings,
-    rng: &mut R,
-) -> Result<String, PasswordGeneratorError> {
-    if settings.length == 0 {
-        return Err(PasswordGeneratorError::LengthTooShort);
+impl PasswordGeneratorSettings {
+    /// Generates a password using the default system entropy source.
+    pub fn generate(&self) -> Result<String, PasswordGeneratorError> {
+        let mut rng = rand::rng();
+        self.generate_with_rng(&mut rng)
     }
 
-    let mut pool: Vec<char> = Vec::with_capacity(96);
-
-    if settings.include_lowercase {
-        pool.extend(LOWERCASE.chars());
-    }
-    if settings.include_uppercase {
-        pool.extend(UPPERCASE.chars());
-    }
-    if settings.include_numbers {
-        pool.extend(NUMBERS.chars());
-    }
-    if settings.include_symbols {
-        pool.extend(SYMBOLS.chars());
-    }
-
-    if !settings.include_similar_characters {
-        pool.retain(|c| !SIMILAR.contains(c));
-    }
-    if !settings.include_ambiguous_characters {
-        pool.retain(|c| !AMBIGUOUS.contains(c));
-    }
-
-    if pool.is_empty() {
-        return Err(PasswordGeneratorError::NoCharacterSetsSelected);
-    }
-
-    let mut required_sets: Vec<&str> = Vec::with_capacity(4);
-    if settings.include_lowercase {
-        required_sets.push(LOWERCASE);
-    }
-    if settings.include_uppercase {
-        required_sets.push(UPPERCASE);
-    }
-    if settings.include_numbers {
-        required_sets.push(NUMBERS);
-    }
-    if settings.include_symbols {
-        required_sets.push(SYMBOLS);
-    }
-
-    if settings.length < (required_sets.len() as u8) {
-        return Err(PasswordGeneratorError::LengthInsufficientForRequiredSets);
-    }
-
-    // First pass: select random characters from the combined pool
-    let mut password: Vec<char> = (0..settings.length)
-        .map(|_| *pool.choose(rng).unwrap())
-        .collect();
-
-    // Second pass: guarantee at least one character from each selected character set
-    for (i, set) in required_sets.iter().enumerate() {
-        let filtered: Vec<char> = set
-            .chars()
-            .filter(|c| {
-                (settings.include_similar_characters || !SIMILAR.contains(c))
-                    && (settings.include_ambiguous_characters || !AMBIGUOUS.contains(c))
-            })
-            .collect();
-        if let Some(&ch) = filtered.choose(rng) {
-            password[i] = ch;
+    /// Generates a password using a provided random number generator.
+    pub fn generate_with_rng<R: Rng + ?Sized>(
+        &self,
+        rng: &mut R,
+    ) -> Result<String, PasswordGeneratorError> {
+        if self.length == 0 {
+            return Err(PasswordGeneratorError::LengthTooShort);
         }
-    }
-    password.shuffle(rng);
 
-    Ok(password.into_iter().collect())
+        let mut pool: Vec<char> = Vec::with_capacity(96);
+
+        if self.include_lowercase {
+            pool.extend(LOWERCASE.chars());
+        }
+        if self.include_uppercase {
+            pool.extend(UPPERCASE.chars());
+        }
+        if self.include_numbers {
+            pool.extend(NUMBERS.chars());
+        }
+        if self.include_symbols {
+            pool.extend(SYMBOLS.chars());
+        }
+
+        if !self.include_similar_characters {
+            pool.retain(|c| !SIMILAR.contains(c));
+        }
+        if !self.include_ambiguous_characters {
+            pool.retain(|c| !AMBIGUOUS.contains(c));
+        }
+
+        if pool.is_empty() {
+            return Err(PasswordGeneratorError::NoCharacterSetsSelected);
+        }
+
+        let mut required_sets: Vec<&str> = Vec::with_capacity(4);
+        if self.include_lowercase {
+            required_sets.push(LOWERCASE);
+        }
+        if self.include_uppercase {
+            required_sets.push(UPPERCASE);
+        }
+        if self.include_numbers {
+            required_sets.push(NUMBERS);
+        }
+        if self.include_symbols {
+            required_sets.push(SYMBOLS);
+        }
+
+        if self.length < (required_sets.len() as u8) {
+            return Err(PasswordGeneratorError::LengthInsufficientForRequiredSets);
+        }
+
+        // First pass: select random characters from the combined pool
+        let mut password: Vec<char> = (0..self.length)
+            .map(|_| *pool.choose(rng).unwrap())
+            .collect();
+
+        // Second pass: guarantee at least one character from each selected character set
+        for (i, set) in required_sets.iter().enumerate() {
+            let filtered: Vec<char> = set
+                .chars()
+                .filter(|c| {
+                    (self.include_similar_characters || !SIMILAR.contains(c))
+                        && (self.include_ambiguous_characters || !AMBIGUOUS.contains(c))
+                })
+                .collect();
+            if let Some(&ch) = filtered.choose(rng) {
+                password[i] = ch;
+            }
+        }
+        password.shuffle(rng);
+
+        Ok(password.into_iter().collect())
+    }
 }
 
 #[cfg(test)]
@@ -98,7 +100,7 @@ mod tests {
             length: 24,
             ..Default::default()
         };
-        let password = generate(settings).unwrap();
+        let password = settings.generate().unwrap();
         assert_eq!(password.len(), 24);
     }
 
@@ -111,8 +113,8 @@ mod tests {
         let mut rng1 = StdRng::seed_from_u64(42);
         let mut rng2 = StdRng::seed_from_u64(42);
 
-        let pw1 = generate_with_rng(settings, &mut rng1).unwrap();
-        let pw2 = generate_with_rng(settings, &mut rng2).unwrap();
+        let pw1 = settings.generate_with_rng(&mut rng1).unwrap();
+        let pw2 = settings.generate_with_rng(&mut rng2).unwrap();
 
         assert_eq!(pw1, pw2);
         assert_eq!(pw1.len(), 12);
@@ -129,7 +131,7 @@ mod tests {
             include_similar_characters: true,
             include_ambiguous_characters: true,
         };
-        let password = generate(settings).unwrap();
+        let password = settings.generate().unwrap();
 
         assert!(password.chars().any(|c| LOWERCASE.contains(c)));
         assert!(password.chars().any(|c| UPPERCASE.contains(c)));
@@ -147,7 +149,7 @@ mod tests {
             ..Default::default()
         };
         assert_eq!(
-            generate(settings),
+            settings.generate(),
             Err(PasswordGeneratorError::NoCharacterSetsSelected)
         );
     }
@@ -159,7 +161,7 @@ mod tests {
             ..Default::default()
         };
         assert_eq!(
-            generate(settings),
+            settings.generate(),
             Err(PasswordGeneratorError::LengthTooShort)
         );
     }
@@ -175,7 +177,7 @@ mod tests {
             ..Default::default()
         };
         assert_eq!(
-            generate(settings),
+            settings.generate(),
             Err(PasswordGeneratorError::LengthInsufficientForRequiredSets)
         );
     }
@@ -187,7 +189,7 @@ mod tests {
             include_similar_characters: false,
             ..Default::default()
         };
-        let password = generate(settings).unwrap();
+        let password = settings.generate().unwrap();
         assert!(password.chars().all(|c| !SIMILAR.contains(&c)));
     }
 
@@ -198,13 +200,13 @@ mod tests {
             include_ambiguous_characters: false,
             ..Default::default()
         };
-        let password = generate(settings).unwrap();
+        let password = settings.generate().unwrap();
         assert!(password.chars().all(|c| !AMBIGUOUS.contains(&c)));
     }
 
     #[test]
     fn default_settings_exclude_similar_and_ambiguous_characters() {
-        let password = generate(PasswordGeneratorSettings::default()).unwrap();
+        let password = PasswordGeneratorSettings::default().generate().unwrap();
         assert!(password.chars().all(|c| !SIMILAR.contains(&c)));
         assert!(password.chars().all(|c| !AMBIGUOUS.contains(&c)));
     }

@@ -1,8 +1,3 @@
-use rand::Rng;
-
-use crate::errors::PasswordGeneratorError;
-use crate::generator::{generate, generate_with_rng};
-
 /// Configuration options for password generation.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub struct PasswordGeneratorSettings {
@@ -28,19 +23,3 @@ impl Default for PasswordGeneratorSettings {
         }
     }
 }
-
-impl PasswordGeneratorSettings {
-    /// Generates a password using the default system entropy source.
-    pub fn generate(&self) -> Result<String, PasswordGeneratorError> {
-        generate(*self)
-    }
-
-    /// Generates a password using a provided random number generator.
-    pub fn generate_with_rng<R: Rng + ?Sized>(
-        &self,
-        rng: &mut R,
-    ) -> Result<String, PasswordGeneratorError> {
-        generate_with_rng(*self, rng)
-    }
-}
-
